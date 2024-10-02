@@ -1,0 +1,38 @@
+.credits-box {
+  position: fixed;
+  padding: 1rem 1rem;
+  background-color: rgb(37, 61, 85);
+  color: white;
+  right: 2rem;
+  top: 2rem;
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.card-btn-section {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.card-btn-section input {
+  max-width: 6rem;
+  width: 100%;
+  text-align: center;
+}
+
+.stock-card {
+  background-color: rgb(58, 82, 181);
+  position: absolute;
+  top: 0.5rem;
+  right: 0;
+  transform: translateX(10%);
+  color: white;
+  padding: 5px 36px;
+}
