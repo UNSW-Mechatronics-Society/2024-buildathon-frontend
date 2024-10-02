@@ -16,7 +16,7 @@ export function useItems() {
   async function getItems() {
     const resp = await fetch(BACKEND_URL + "?request=items");
     const items_ = JSON.parse(await resp.text()).map((data, i) => {
-      return { ...data, _position: i };
+      return { ...data, _position: i === 1 ? 100 : i };
     });
 
     return items_;

@@ -4,6 +4,8 @@ import Form from "react-bootstrap/Form";
 import { useSessionStorage } from "usehooks-ts";
 import { BACKEND_URL } from "../constants";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import LoadingScreen from "../components/LoadingScreen";
 
 function LoginPage() {
   const [zID, setZID] = useSessionStorage("zID", null);
@@ -45,6 +47,8 @@ function LoginPage() {
 
   return (
     <div className="container">
+      {post.isPending &&<LoadingScreen></LoadingScreen>}
+      <Navbar></Navbar>
       <h1>Enter Your zID (including the z)</h1>
       <Form onSubmit={onFormSubmit}>
         <Form.Group className="mb-3">

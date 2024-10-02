@@ -4,17 +4,27 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCredits } from "../hooks/useCredits";
 import { useSessionStorage } from "usehooks-ts";
 import { BACKEND_URL } from "../constants";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import LoadingScreen from "../components/LoadingScreen";
 
 function ReviewOrdersPage() {
   const { state } = useLocation();
+  const [zID] = useSessionStorage("zID", null);
+  const [name] = useSessionStorage("name", null);
   const [teamID] = useSessionStorage("teamID", null);
   const nav = useNavigate();
+
+  
+  
   const items = useMemo(() => {
     return state.items.filter((v) => v.count > 0);
   }, [state.items]);
+  console.log(items);
+
+  const queryClient = useQueryClient()
 
   const creditsQuery = useCredits();
+
   const remainingCredits = useMemo(() => {
     return (
       creditsQuery.data -
@@ -24,7 +34,7 @@ function ReviewOrdersPage() {
 
   function onPurchase() {
     if (remainingCredits < 0 || isNaN(remainingCredits)) {
-      alert("Insufficient Credits. (Nice try though)");
+      alert("Insufficient Credits.");
     } else if (items.length === 0) {
       alert("Add items to your cart.");
     } else {
@@ -38,7 +48,7 @@ function ReviewOrdersPage() {
         await fetch(BACKEND_URL, {
           redirect: "follow",
           method: "POST",
-          body: JSON.stringify({ request: "purchase", teamID, items }),
+          body: JSON.stringify({ request: "purchase", teamID, name, zID,orders:items }),
           headers: {
             "Content-Type": "text/plain;charset=utf-8",
           },
@@ -50,9 +60,19 @@ function ReviewOrdersPage() {
   const purchase = useMutation({
     mutationFn: onPurchaseMutation,
     onSuccess: (res) => {
-      console.log(res);
-      alert("Purchase Success.");
-      // nav("/shop");
+      if (!res) {
+        queryClient.invalidateQueries({ queryKey: ['credits'] })
+        queryClient.invalidateQueries({ queryKey: ['items'] })
+        alert("Purchase Failed.");
+        nav("/shop");
+      }
+      else {
+        queryClient.invalidateQueries({ queryKey: ['credits'] })
+        queryClient.invalidateQueries({ queryKey: ['items'] })
+        alert("Purchase Success.");
+        nav("/shop");
+
+      }
     },
 
     onError: () => {
@@ -62,9 +82,10 @@ function ReviewOrdersPage() {
 
   return (
     <div className="page-wrapper">
+      {(creditsQuery.isFetching || purchase.isPending) && <LoadingScreen></LoadingScreen>}
       <div className="container">
         <h1>Order Review</h1>
-
+      
         <Stack>
           {items.map((item, index) => (
             <p key={index}>

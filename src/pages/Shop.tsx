@@ -6,6 +6,8 @@ import { BACKEND_URL } from "../constants";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useCredits } from "../hooks/useCredits";
 import { useItems } from "../hooks/useItems";
+import Navbar from "../components/Navbar";
+import LoadingScreen from "../components/LoadingScreen";
 
 function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
   const [count, setCount] = useState(0);
@@ -20,7 +22,7 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
   }, [count]);
 
   // Calculate the max count by taking the minimum of remaining stock, remaining cap, and max affordable
-  const maxCount = Math.min(remainingStock, remainingCap, maxAffordable);
+  const maxCount = Math.max(Math.min(remainingStock, remainingCap, maxAffordable), 0);
   return (
     <Card
       key={itemsData.id}
@@ -28,11 +30,11 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
         position: "relative",
         padding: "1rem",
         height: "100%",
-        opacity: `${maxCount === 0 ? 0.6 : 1}`,
+        opacity: `${(maxCount === 0 && itemsData.id != 1) ? 0.6 : 1}`,
       }}
       className="text-center"
     >
-      {itemsData.id !== 15 && (
+      {itemsData.id !== 1 && (
         <div className="stock-card">
           <span>Stock: </span>
           <span>{itemsData.stock}</span>
@@ -42,7 +44,7 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
       <Card.Img
         variant="top"
         style={{ height: "9rem", width: "9rem", margin: "0 auto" }}
-        src={`https://lh3.googleusercontent.com/d/${itemsData.imageId}=s4000?authuser=0`}
+        src={`/items/${itemsData.id}.png`}
         alt={itemsData.name}
       />
       <Card.Body>
@@ -50,7 +52,7 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
         <Card.Text>{itemsData.desc}</Card.Text>
       </Card.Body>
       <Card.Text>Credit Cost: {itemsData.points}</Card.Text>
-      {itemsData.id !== 15 ? (
+      {itemsData.id !== 1 ? (
         <div className="card-btn-section">
           <Button
             variant="primary"
@@ -128,11 +130,13 @@ function ShopPage() {
 
   return (
     <div className="page">
+      {(itemsQuery.isFetching || creditsQuery.isFetching || ordersQuery.isFetching) && <LoadingScreen></LoadingScreen>}
       <div className="credits-box">
         <span>Current Credits:</span>
         <span className="font-weight-bold">{creditsQuery.data}</span>
       </div>
       <div className="container">
+        <Navbar></Navbar>
         <h1>Hello Team {teamID}</h1>
         <Container>
           <Row xs={1} md={2} lg={3} style={{ rowGap: "2rem" }}>
@@ -140,7 +144,7 @@ function ShopPage() {
               creditsQuery.data &&
               itemsQuery.data
                 ?.sort((a, b) => {
-                  return a.id - b.id;
+                  return a._position - b._position;
                 })
                 .map((v) => (
                   <Col key={v.id}>
