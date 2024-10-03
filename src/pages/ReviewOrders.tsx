@@ -33,8 +33,10 @@ function ReviewOrdersPage() {
   function onPurchase() {
     if (remainingCredits < 0 || isNaN(remainingCredits)) {
       alert("Insufficient Credits.");
+      nav("/shop");
     } else if (items.length === 0) {
       alert("Add items to your cart.");
+      nav("/shop");
     } else {
       purchase.mutate();
     }
@@ -74,11 +76,12 @@ function ReviewOrdersPage() {
       }
       queryClient.invalidateQueries({ queryKey: ["credits"] });
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      nav("/shop");
+      nav("/history");
     },
 
     onError: (res) => {
       alert(res.message);
+      nav("/history");
     },
   });
 
