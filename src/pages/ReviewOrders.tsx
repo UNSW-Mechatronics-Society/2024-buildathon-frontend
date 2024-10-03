@@ -12,16 +12,14 @@ function ReviewOrdersPage() {
   const [zID] = useSessionStorage("zID", null);
   const [name] = useSessionStorage("name", null);
   const [teamID] = useSessionStorage("teamID", null);
+  const [jwt] = useSessionStorage("jwt", null);
   const nav = useNavigate();
 
-  
-  
   const items = useMemo(() => {
     return state.items.filter((v) => v.count > 0);
   }, [state.items]);
-  console.log(items);
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const creditsQuery = useCredits();
 
@@ -48,7 +46,14 @@ function ReviewOrdersPage() {
         await fetch(BACKEND_URL, {
           redirect: "follow",
           method: "POST",
-          body: JSON.stringify({ request: "purchase", teamID, name, zID,orders:items }),
+          body: JSON.stringify({
+            request: "purchase",
+            teamID,
+            name,
+            zID,
+            orders: items,
+            jwt,
+          }),
           headers: {
             "Content-Type": "text/plain;charset=utf-8",
           },
@@ -60,32 +65,31 @@ function ReviewOrdersPage() {
   const purchase = useMutation({
     mutationFn: onPurchaseMutation,
     onSuccess: (res) => {
-      if (!res) {
-        queryClient.invalidateQueries({ queryKey: ['credits'] })
-        queryClient.invalidateQueries({ queryKey: ['items'] })
-        alert("Purchase Failed.");
-        nav("/shop");
-      }
-      else {
-        queryClient.invalidateQueries({ queryKey: ['credits'] })
-        queryClient.invalidateQueries({ queryKey: ['items'] })
-        alert("Purchase Success.");
-        nav("/shop");
+      console.log(res);
 
+      if (res.status === "SUCCESS") {
+        alert("Purchase Success.");
+      } else {
+        alert(res.msg);
       }
+      queryClient.invalidateQueries({ queryKey: ["credits"] });
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      nav("/shop");
     },
 
-    onError: () => {
-      alert("Purchase Failed.");
+    onError: (res) => {
+      alert(res.message);
     },
   });
 
   return (
     <div className="page-wrapper">
-      {(creditsQuery.isFetching || purchase.isPending) && <LoadingScreen></LoadingScreen>}
+      {(creditsQuery.isFetching || purchase.isPending) && (
+        <LoadingScreen></LoadingScreen>
+      )}
       <div className="container">
         <h1>Order Review</h1>
-      
+
         <Stack>
           {items.map((item, index) => (
             <p key={index}>

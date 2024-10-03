@@ -1,1 +1,2 @@
-export const BACKEND_URL = "https://script.google.com/macros/s/AKfycbyURN8GITD33NStYsHaT3ftqPBtNlBXJMDYJfhGe6T7gFMNFITla2AK_EyyR4eKr0sQvw/exec"
+export const BACKEND_URL =
+  "https://script.google.com/macros/s/AKfycbx_qsRuPvLFEiHqHDug2KiCvUhGigbSLBvEWWLEJ7v9Y3GIQuKC8Pv6yIbMq0ZvOE7W/exec";

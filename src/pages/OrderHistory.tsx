@@ -9,6 +9,7 @@ import Navbar from "../components/Navbar";
 import Table from "react-bootstrap/Table";
 function OrderHistoryPage() {
   const [teamID] = useSessionStorage("teamID", null);
+  const [jwt] = useSessionStorage("jwt", null);
   const nav = useNavigate();
   useEffect(() => {
     if (teamID == null) {
@@ -16,7 +17,9 @@ function OrderHistoryPage() {
     }
   });
   async function getHistory() {
-    const resp = await fetch(BACKEND_URL + `?request=history&team=${teamID}`);
+    const resp = await fetch(
+      BACKEND_URL + `?request=history&team=${teamID}&jwt=${jwt}`
+    );
     const items_ = JSON.parse(await resp.text()).map((data, i) => {
       return { ...data, _position: i === 1 ? 100 : i };
     });

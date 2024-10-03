@@ -22,7 +22,10 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
   }, [count]);
 
   // Calculate the max count by taking the minimum of remaining stock, remaining cap, and max affordable
-  const maxCount = Math.max(Math.min(remainingStock, remainingCap, maxAffordable), 0);
+  const maxCount = Math.max(
+    Math.min(remainingStock, remainingCap, maxAffordable),
+    0
+  );
   return (
     <Card
       key={itemsData.id}
@@ -30,7 +33,7 @@ function ShopCard({ itemsData, teamCredits, ordersData, onChange }) {
         position: "relative",
         padding: "1rem",
         height: "100%",
-        opacity: `${(maxCount === 0 && itemsData.id != 1) ? 0.6 : 1}`,
+        opacity: `${maxCount === 0 && itemsData.id != 1 ? 0.6 : 1}`,
       }}
       className="text-center"
     >
@@ -107,9 +110,11 @@ function ShopPage() {
   const [teamID] = useSessionStorage("teamID", null);
   const nav = useNavigate();
   const ordersPending = useRef(new Map<string, number>());
-
+  const [jwt] = useSessionStorage("jwt", null);
   async function getOrders() {
-    const resp = await fetch(BACKEND_URL + `?request=ordered&team=${teamID}`);
+    const resp = await fetch(
+      BACKEND_URL + `?request=ordered&team=${teamID}&jwt=${jwt}`
+    );
     const orders = JSON.parse(await resp.text());
     return orders;
   }
@@ -130,7 +135,9 @@ function ShopPage() {
 
   return (
     <div className="page">
-      {(itemsQuery.isFetching || creditsQuery.isFetching || ordersQuery.isFetching) && <LoadingScreen></LoadingScreen>}
+      {(itemsQuery.isFetching ||
+        creditsQuery.isFetching ||
+        ordersQuery.isFetching) && <LoadingScreen></LoadingScreen>}
       <div className="credits-box">
         <span>Current Credits:</span>
         <span className="font-weight-bold">{creditsQuery.data}</span>

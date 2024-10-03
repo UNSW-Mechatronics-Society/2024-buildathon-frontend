@@ -11,6 +11,7 @@ function LoginPage() {
   const [zID, setZID] = useSessionStorage("zID", null);
   const [name, setName] = useSessionStorage("name", null);
   const [teamID, setTeamID] = useSessionStorage("teamID", null);
+  const [jwt, setJwt] = useSessionStorage("jwt", null);
   const nav = useNavigate();
   async function login(zID) {
     return JSON.parse(
@@ -30,9 +31,14 @@ function LoginPage() {
   const post = useMutation({
     mutationFn: login,
     onSuccess: (res) => {
+      if (res.status === "ERROR") {
+        alert("Invalid zID, if problem persists, please contact organisers.");
+        return;
+      }
       setZID(res.zID);
       setName(res.name);
       setTeamID(res.teamID);
+      setJwt(res.jwt);
       nav("/shop");
     },
     onError: () => {
@@ -47,7 +53,7 @@ function LoginPage() {
 
   return (
     <div className="container">
-      {post.isPending &&<LoadingScreen></LoadingScreen>}
+      {post.isPending && <LoadingScreen></LoadingScreen>}
       <Navbar></Navbar>
       <h1>Enter Your zID (including the z)</h1>
       <Form onSubmit={onFormSubmit}>
