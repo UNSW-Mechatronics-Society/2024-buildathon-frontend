@@ -1,15 +1,12 @@
 .credits-box {
-  position: fixed;
-  padding: 1rem 1rem;
+  padding: 1rem;
   background-color: rgb(37, 61, 85);
   color: white;
   right: 2rem;
   top: 2rem;
   border-radius: 32px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  z-index: 10;
 }
 .font-weight-bold {
   font-weight: bold;

@@ -12,7 +12,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      <BrowserRouter>
+      <BrowserRouter
+        basename={
+          process.env.NODE_ENV === "development"
+            ? ""
+            : "/2024-buildathon-frontend/"
+        }
+      >
         <Routes>
           <Route path="/" Component={LoginPage} />
           <Route path="/shop" Component={ShopPage} />
